@@ -56,6 +56,19 @@ def form():
     return render_template('form.html')
 
 
+@app.route('/math/', methods=['GET', 'POST'])
+def math():
+    if request.method == 'POST':
+        first_num = float(request.form.get('first_num'))
+        second_num = float(request.form.get('second_num'))
+        addition = first_num + second_num
+        subtraction = first_num - second_num
+        multiplication = first_num * second_num
+        division = first_num // second_num
+        return render_template('math-results.html', first_num=first_num, second_num=second_num, addition=addition, subtraction=subtraction, multiplication=multiplication, division=division)
+    return render_template('math.html')
+
+
 if __name__ == '__main__':
     # debug = True anables automatic reload on changes and better error messeges
     app.run(debug=True)
