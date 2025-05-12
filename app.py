@@ -56,7 +56,7 @@ def form():
     return render_template('form.html')
 
 
-@app.route('/math/', methods=['GET', 'POST'])
+@app.route('/math', methods=['GET', 'POST'])
 def math():
     if request.method == 'POST':
         first_num = float(request.form.get('first_num'))
