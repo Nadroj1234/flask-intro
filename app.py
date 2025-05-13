@@ -1,28 +1,28 @@
 """WHAT WE'VE DONE SO FAR"""
-'''
-1. Created a virtual environement with venv "python -m venv venv
-    - This creates a venv folder containing a copy of python and pip for just this project
+"""
+1. Created a virtual environment with venv "python -m venv venv"
+    - This create a venv folder containing a copy of python and pip for just this project
     - Note: pip is python's package installer (for external libraries)
-2. Activate the virtual environment with "./venv/Scripts/activate"
-    - This should put (venv) at the front of the comman line
+2. Activated the virtual environment with "./venv/Scripts/activate"
+    - This should put (venv) at the front of the command line
 3. Installed flask with "pip install flask"
 
 4. Created templates in a templates folder to return html pages
-
-5.rendered the templates with render_template()
-6. Create a rquirements.txt file that will let you or others easily install the packages the app needs
-    - Created with: pip freeze requirements.txt
+5. Rendered the templates with render_template()
+6. Create a requirements.txt file that will let you or others easily install packages the app needs
+    - Created with: pip freeze > requirements.txt
     - Can be run with pip install -r requirements.txt
-7. Add a .gitignore to make sure we dont commit our venv stuff
+7. Added a .gitignore to make sure we don't commit our venv stuff
 8. Created static folder to be used to server other local resources (css/js/images)
     - used url_for() to load static assets in html pages.
-'''
+"""
 
 # Import the Flask class from the flask module
 
-# Create an instance of the flask app
+# Create an instance of the Flask app
+from flask import Flask, render_template, request # render_template loads HTML from /templates
 import datetime
-from flask import Flask, render_template, request  # render_template loads html from /templates
+import requests
 
 
 app = Flask(__name__)
@@ -32,43 +32,50 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    # Return a simple string that is valid html
-    # return '<h1>Welcome to my Flask App!</h1>'
-    # return the home template:
-    return render_template('home.html')
+    # Return a simple string that is valid HTML
+    # return "<h1>Welcome to my Flask App!</h1>"
+    # Return the home template:
+    return render_template("home.html")
 
 
 @app.route("/time")
 def time():
     # get the current time on the server
     now = datetime.datetime.now()
-    # return f'<h2> Current Server Time: {now}</h2>'
+    # return f"<h2>Current Server Time: {now}</h2>"
 
-    return render_template('time.html', current_time=now)
+    return render_template("time.html", current_time=now)
 
 
-@app.route('/form/', methods=['GET', 'POST'])
+@app.route("/form", methods=['GET', 'POST'])
 def form():
     if request.method == 'POST':
         name = request.form.get('name')
         ssn = request.form.get('ssn')
-        return render_template('greeting.html', name=name, ssn=ssn)
-    return render_template('form.html')
+        return render_template("greeting.html", name=name, ssn=ssn)
+    return render_template("form.html")
 
 
-@app.route('/math', methods=['GET', 'POST'])
-def math():
-    if request.method == 'POST':
-        first_num = float(request.form.get('first_num'))
-        second_num = float(request.form.get('second_num'))
-        addition = first_num + second_num
-        subtraction = first_num - second_num
-        multiplication = first_num * second_num
-        division = first_num // second_num
-        return render_template('math-results.html', first_num=first_num, second_num=second_num, addition=addition, subtraction=subtraction, multiplication=multiplication, division=division)
-    return render_template('math.html')
+@app.route("/catfact")
+def catfact():
+    response = requests.get("https://catfact.ninja/fact")
+    if response.status_code == 200:  # we successfully got a response
+        data = response.json()
+        fact = data["fact"]
+    else:
+        fact = "Could not fetch a cat fact right now. Try again later"
+
+    picresp = requests.get("https://cataas.com/cat?json=true")
+    if picresp.status_code == 200:  # we successfully got a response
+        picdata = response.json()
+        print(picdata)
+        pic = picdata["url"]
+    else:
+        pic = "/images/404.png"
+
+    return render_template("catfact.html", cat_fact=fact, pic=pic)
 
 
-if __name__ == '__main__':
-    # debug = True anables automatic reload on changes and better error messeges
+if __name__ == "__main__":
+    # debug = True enables automatic reload on changes and better error messages
     app.run(debug=True)
