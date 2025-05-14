@@ -20,9 +20,9 @@
 # Import the Flask class from the flask module
 
 # Create an instance of the Flask app
-from flask import Flask, render_template, request # render_template loads HTML from /templates
 import datetime
 import requests
+from flask import Flask, render_template, request # render_template loads HTML from /templates
 
 
 app = Flask(__name__)
@@ -56,6 +56,19 @@ def form():
     return render_template("form.html")
 
 
+@app.route("/math", methods=['GET', 'POST'])
+def math():
+    if request.method == 'POST':
+        first_num = float(request.form.get('first_num'))
+        second_num = float(request.form.get('second_num'))
+        addition = first_num + second_num
+        subtraction = first_num - second_num
+        multiplication = first_num * second_num
+        division = first_num / second_num
+        return render_template("math-results.html", first_num=first_num, second_num=second_num, addition=addition, subtraction=subtraction, multiplication=multiplication, division=division)
+    return render_template("math.html")
+
+
 @app.route("/catfact")
 def catfact():
     response = requests.get("https://catfact.ninja/fact")
@@ -67,13 +80,32 @@ def catfact():
 
     picresp = requests.get("https://cataas.com/cat?json=true")
     if picresp.status_code == 200:  # we successfully got a response
-        picdata = response.json()
-        print(picdata)
+        picdata = picresp.json()
         pic = picdata["url"]
     else:
         pic = "/images/404.png"
 
     return render_template("catfact.html", cat_fact=fact, pic=pic)
+
+
+@app.route('/dog', methods=['GET', 'POST'])
+def dog():
+    image_url = None  # This will be a dog image
+    error = None  # Hols an error message if something goes wrong
+    breed = None
+
+    if request.method == 'POST':
+        breed = request.form.get('breed').lower()
+        api_url = f'https://dog.ceo/api/breed/{breed}/images/random'
+        response = requests.get(api_url)
+
+        # check for valid response
+        if response.status_code == 200 and response.json().get('status') == 'success':
+            image_url = response.json()['message']
+        else:
+            error = f"Could not find breed '{breed}'. Try Another!"
+
+    return render_template('dog.html', image_url=image_url, error=error, breed=breed)
 
 
 if __name__ == "__main__":
