@@ -13,14 +13,13 @@
     <h2>Search for a Dog by Breed</h2>
 
     <!-- Create a basic Form -->
+    <label for="breed">Select a breed</label>
     <form action="/dog" method="POST">
-      <input
-        type="text"
-        name="breed"
-        placeholder="e.g. pug, hound, retriever"
-        required
-        value="{{breed}}"
-      />
+      <select name="breed" id="breed" required>
+        {% for br in breeds %}
+        <option value="{{br}}">{{br}}</option>
+        {% endfor %}
+      </select>
       <button type="submit">Show me the dog!</button>
     </form>
     <!-- Template logic: Show this only if there is an error -->
